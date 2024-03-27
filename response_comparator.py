@@ -8,10 +8,10 @@ from openpyxl.styles import Font
 import re
 
 def preprocess_text(text):
-    # Define a regex pattern to match various types of separators
-    separator_pattern = r'\s*([\u2022\u2023\u25E6\-•\d\.]+)\s*'
+    # Define a regex pattern to match numbered patterns and various types of separators
+    separator_pattern = r'^\s*(?:\d+[\.\)]|[\u2022\u2023\u25E6\-•]\s*)'
     # Replace separators with a single space
-    text = re.sub(separator_pattern, ' ', text)
+    text = re.sub(separator_pattern, '', text, flags=re.MULTILINE)
     # Remove extra spaces and line breaks
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
