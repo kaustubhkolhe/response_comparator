@@ -5,7 +5,9 @@ import jellyfish
 import openpyxl
 import nltk
 from openpyxl.styles import Font
+import psutil
 import re
+
 
 def preprocess_text(text):
     # Define a regex pattern to match numbered patterns and various types of separators
@@ -16,7 +18,24 @@ def preprocess_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
+
+def is_excel_open(excel_file):
+    for process in psutil.process_iter():
+        try:
+            if "EXCEL.EXE" in process.name():
+                for file in process.open_files():
+                    if excel_file.lower() in file.path.lower():
+                        return True
+        except psutil.AccessDenied:
+            continue
+    return False
+
+
 def print_hyperlinks_and_values(excel_file):
+    if is_excel_open(excel_file):
+        print("Error: Please close Excel before running this script.")
+        return
+
     try:
         wb = openpyxl.load_workbook(excel_file, data_only=True)
     except FileNotFoundError:
@@ -88,6 +107,8 @@ def print_hyperlinks_and_values(excel_file):
 
     # Save the modified Excel file
     wb.save(excel_file)
+    print("Task Completed")
 
-excel_file = 'Q&A_data.xlsx'
+
+excel_file = r"C:\Users\Kaustubh\Documents\CODING\PY\Q&A_data.xlsx"
 print_hyperlinks_and_values(excel_file)
